@@ -57,7 +57,7 @@ Fintech
 │   │   │   ├── entity
 │   │   │   └── config
 │   │   └── resources
-│   │       └── application.yml
+│   │       └── application.properties
 │   └── test
 ├── build.gradle
 └── README.md
@@ -66,17 +66,17 @@ Fintech
 ---
 
 ## 🗒️ ERD (Entity Relationship Diagram)
-**ERD**를 통해 프로젝트의 엔티티 구조를 한눈에 볼 수 있습니다. 
+**ERD**를 통해 프로젝트의 엔티티 구조를 한눈에 볼 수 있습니다.
+([여기서 더 자세히 확인](https://dbdiagram.io/d/66f4cc273430cb846ca6d336))
 
 ![ERD Diagram](erd.png)
-
 ---
 
 ## 📆 프로젝트 진행 계획
 - **1주차**: 요구사항 분석 및 환경 설정
 - **2주차**: 사용자 관리 기능 개발
-- **3주차**: 계좌 관리 및 송금 기능 개발
-- **4주차**: 보안 및 인증 기능 구현
+- **3주차**: 보안 및 인증 기능 구현
+- **4주차**: 계좌 관리 및 송금 기능 개발
 - **5주차**: 테스트 및 배포 준비
 
 ---
