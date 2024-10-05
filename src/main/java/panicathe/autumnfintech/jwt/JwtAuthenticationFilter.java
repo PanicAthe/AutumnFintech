@@ -47,8 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String userEmail = jwtProvider.getEmail(token);
             String role = jwtProvider.getRole(token);
 
-            System.out.println("이메일" + userEmail);
-            System.out.println("롤" + role); //디버깅
             // 검증 실패 시, 다음 필터로 요청을 넘긴다.
             if (userEmail == null || role == null) {
                 filterChain.doFilter(request, response);

@@ -28,8 +28,6 @@ public class JwtProvider {
 
         Date expiredDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
 
-        System.out.println("토큰만들 이메일 " + email);
-
         return Jwts.builder()
                 .claim("email", email)
                 .claim("role", role)
