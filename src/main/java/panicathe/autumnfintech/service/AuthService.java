@@ -2,6 +2,7 @@ package panicathe.autumnfintech.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import panicathe.autumnfintech.entity.User;
 import panicathe.autumnfintech.jwt.JwtProvider;
 import panicathe.autumnfintech.repository.UserRepository;
 
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -21,14 +23,14 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
+
     @Transactional
     public void register(UserDto userDto) {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new IllegalArgumentException("Email already exists.");
         }
-        if (userRepository.existsByUsername(userDto.getUsername())) {
+        if(userRepository.existsByUsername(userDto.getUsername()))
             throw new IllegalArgumentException("Username already exists.");
-        }
 
         User user = User.builder()
                 .username(userDto.getUsername())
@@ -38,7 +40,7 @@ public class AuthService {
                 .role("ROLE_USER")
                 .build();
 
-        userRepository.save(user); // 새로운 유저 저장, save() 호출 필요
+        userRepository.save(user);
     }
 
     @Transactional
@@ -58,12 +60,12 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
+
 //        if (userRepository.countAccountsById(user.getId()) > 0) {
 //            throw new IllegalArgumentException("Cannot delete user with active accounts.");
 //        }  Account 기능 생성후 수정.
 
         user.setActive(false); // Soft delete
-        // save() 호출 불필요 - JPA 변경 감지(dirty checking)가 자동으로 동작
+        userRepository.save(user);
     }
 }
-
