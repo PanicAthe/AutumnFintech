@@ -58,9 +58,9 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-//        if (userRepository.countAccountsById(user.getId()) > 0) {
-//            throw new IllegalArgumentException("Cannot delete user with active accounts.");
-//        }  Account 기능 생성후 수정.
+        if (userRepository.countAccountsById(user.getId()) > 0) {
+            throw new IllegalArgumentException("Cannot delete user with active accounts.");
+        }
 
         user.setActive(false); // Soft delete
         // save() 호출 불필요 - JPA 변경 감지(dirty checking)가 자동으로 동작
