@@ -26,4 +26,5 @@ public class SwaggerConfig {
                         .description("API documentation for the Autumn Fintech project"))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"));
     }
+
 }

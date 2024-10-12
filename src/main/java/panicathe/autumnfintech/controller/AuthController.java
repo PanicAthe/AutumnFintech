@@ -20,6 +20,7 @@ public class AuthController {
 
     private final AuthService authService;
 
+    // 1. 회원가입
     @Operation(summary = "Register a new user", description = "Registers a new user and returns a JWT token")
     @PostMapping("/users")
     public ResponseEntity<ApiResponse<String>> register(@Valid @RequestBody UserDto userDto) {
@@ -27,6 +28,7 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResponse<>(true, "User registered successfully", null));
     }
 
+    // 2. 로그인(jwt 토큰 발급)
     @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token")
     @PostMapping("/tokens")
     public ResponseEntity<ApiResponse<String>> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
@@ -34,6 +36,7 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Login successful", token));
     }
 
+    // 3. 회원탈퇴
     @Operation(summary = "Delete user", description = "Deletes a user account")
     @DeleteMapping("/users/delete")
     public ResponseEntity<ApiResponse<String>> deleteUser(@AuthenticationPrincipal String email) {
