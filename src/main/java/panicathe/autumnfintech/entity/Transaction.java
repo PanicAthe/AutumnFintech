@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "transaction")
 @EntityListeners(AuditingEntityListener.class)  // 이 부분을 추가
-@Setter
 @Getter
 @Builder
 @NoArgsConstructor
@@ -47,14 +46,13 @@ public class Transaction {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    // 거래 취소 가능 여부 확인
     public boolean canBeCancelled() {
         return this.createdAt.isAfter(LocalDateTime.now().minusHours(1)) && !isCancelled;
     }
 
+    // 거래 취소 메서드
     public void cancelTransaction() {
-        if (canBeCancelled()) {
-            this.isCancelled = true;
-            // 추가로 환불 로직 구현
-        }
+        this.isCancelled = true;
     }
 }
