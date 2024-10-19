@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "account")
-@Setter
 @Getter
 @Builder
 @NoArgsConstructor
@@ -26,9 +25,11 @@ public class Account {
     @Column(unique = true, nullable = false)
     private String accountNumber;
 
+    @Setter
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal balance;
 
+    @Setter
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal transferLimit;
 
@@ -47,7 +48,7 @@ public class Account {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    public boolean canDelete() {
-        return this.balance.compareTo(BigDecimal.ZERO) == 0;  // 계좌 잔액이 0이어야 삭제 가능
+    public void setActive(boolean b) {
+        this.isActive = b;
     }
 }

@@ -1,6 +1,5 @@
 package panicathe.autumnfintech.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -8,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import panicathe.autumnfintech.dto.user.LoginRequestDto;
 import panicathe.autumnfintech.dto.user.UserDto;
 import panicathe.autumnfintech.entity.User;
+import panicathe.autumnfintech.exception.custom.*;
 
 import panicathe.autumnfintech.jwt.JwtProvider;
 import panicathe.autumnfintech.repository.UserRepository;
@@ -24,10 +24,10 @@ public class AuthService {
     @Transactional
     public void register(UserDto userDto) {
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists.");
+            throw new EmailAlreadyExistsException();  // 이메일 중복 예외
         }
         if (userRepository.existsByUsername(userDto.getUsername())) {
-            throw new IllegalArgumentException("Username already exists.");
+            throw new UsernameAlreadyExistsException();  // 사용자명 중복 예외
         }
 
         User user = User.builder()
@@ -44,10 +44,10 @@ public class AuthService {
     @Transactional
     public String login(LoginRequestDto loginRequestDto) {
         User user = userRepository.findByEmail(loginRequestDto.getEmail())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(UserNotFoundException::new);  // 사용자를 찾지 못한 경우
 
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new InvalidCredentialsException();  // 잘못된 인증 정보 예외
         }
 
         return jwtProvider.create(user.getEmail(), user.getRole());
@@ -56,14 +56,16 @@ public class AuthService {
     @Transactional
     public void deleteUser(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(UserNotFoundException::new);  // 사용자 찾지 못함
 
         if (userRepository.countAccountsById(user.getId()) > 0) {
-            throw new IllegalArgumentException("Cannot delete user with active accounts.");
+            throw new UserHasActiveAccountsException();  // 활성 계좌가 있는 사용자 예외
         }
 
         user.setActive(false); // Soft delete
         // save() 호출 불필요 - JPA 변경 감지(dirty checking)가 자동으로 동작
     }
 }
+
+
 

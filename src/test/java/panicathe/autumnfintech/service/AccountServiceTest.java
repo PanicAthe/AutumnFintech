@@ -3,7 +3,6 @@ package panicathe.autumnfintech.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,6 +12,7 @@ import panicathe.autumnfintech.dto.account.AccountDto;
 import panicathe.autumnfintech.dto.account.CreateAccountDto;
 import panicathe.autumnfintech.entity.Account;
 import panicathe.autumnfintech.entity.User;
+import panicathe.autumnfintech.exception.custom.*;
 import panicathe.autumnfintech.repository.AccountRepository;
 import panicathe.autumnfintech.repository.UserRepository;
 
@@ -74,7 +74,7 @@ class AccountServiceTest {
         when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
 
         // Then
-        assertThrows(EntityNotFoundException.class, () -> accountService.createAccount("nonexistent@example.com", CreateAccountDto.builder()
+        assertThrows(UserNotFoundException.class, () -> accountService.createAccount("nonexistent@example.com", CreateAccountDto.builder()
                 .transferLimit(BigDecimal.valueOf(500)).build()));
     }
 
@@ -100,7 +100,7 @@ class AccountServiceTest {
         when(accountRepository.findByIdAndUser(1L, testUser)).thenReturn(Optional.empty());
 
         // Then
-        assertThrows(EntityNotFoundException.class, () -> accountService.getOwnAccountDetails("test@example.com", 1L));
+        assertThrows(AccountNotFoundException.class, () -> accountService.getOwnAccountDetails("test@example.com", 1L));
     }
 
     @Test
@@ -124,6 +124,6 @@ class AccountServiceTest {
         when(accountRepository.findByIdAndUser(1L, testUser)).thenReturn(Optional.of(testAccount));
 
         // Then
-        assertThrows(IllegalArgumentException.class, () -> accountService.deleteAccount("test@example.com", 1L));
+        assertThrows(InsufficientBalanceException.class, () -> accountService.deleteAccount("test@example.com", 1L));
     }
 }

@@ -48,8 +48,8 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**", "/auth/**").permitAll()
-                        .requestMatchers("/partner/**").hasAuthority("ROLE_PARTNER")
-                        .requestMatchers("/user/**").hasAuthority("ROLE_USER")
+                        .requestMatchers("/user/**").hasAuthority("ROLE_USER")  // ROLE_USER만 접근 가능
+                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")  // ROLE_ADMIN만 접근 가능
                         .anyRequest().authenticated())
 
                 .exceptionHandling(exceptionHandling -> exceptionHandling
@@ -87,7 +87,7 @@ class FailedAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException {
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.getWriter().write("{\"code\":\"NP\", \"message\": \"No Permission\"}");
+        response.getWriter().write("{\"No Permission\"}");
     }
 }
 

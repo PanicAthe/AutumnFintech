@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user")
-@Setter
 @Getter
 @Builder
 @NoArgsConstructor
@@ -44,4 +43,8 @@ public class User {
     @LastModifiedDate // 수정 시 자동으로 시간 기록
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    public void setActive(boolean b) {
+        this.isActive = b;
+    }
 }

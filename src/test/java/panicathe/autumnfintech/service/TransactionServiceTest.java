@@ -13,6 +13,7 @@ import panicathe.autumnfintech.dto.TransferDto;
 import panicathe.autumnfintech.entity.Account;
 import panicathe.autumnfintech.entity.Transaction;
 import panicathe.autumnfintech.entity.enums.TransactionType;
+import panicathe.autumnfintech.exception.custom.*;
 import panicathe.autumnfintech.repository.AccountRepository;
 import panicathe.autumnfintech.repository.TransactionRepository;
 
@@ -76,7 +77,7 @@ class TransactionServiceTest {
         testAccount.setActive(false);
         when(accountService.getAccountByEmailAndId("test@example.com", 1L)).thenReturn(testAccount);
 
-        assertThrows(IllegalStateException.class, () -> transactionService.deposit("test@example.com", 1L, BigDecimal.valueOf(100)));
+        assertThrows(AccountInactiveException.class, () -> transactionService.deposit("test@example.com", 1L, BigDecimal.valueOf(100)));
     }
 
     @Test
@@ -100,14 +101,14 @@ class TransactionServiceTest {
         testAccount.setActive(false);
         when(accountService.getAccountByEmailAndId("test@example.com", 1L)).thenReturn(testAccount);
 
-        assertThrows(IllegalStateException.class, () -> transactionService.withdraw("test@example.com", 1L, BigDecimal.valueOf(100)));
+        assertThrows(AccountInactiveException.class, () -> transactionService.withdraw("test@example.com", 1L, BigDecimal.valueOf(100)));
     }
 
     @Test
     void withdraw_insufficientBalance_throwsException() {
         when(accountService.getAccountByEmailAndId("test@example.com", 1L)).thenReturn(testAccount);
 
-        assertThrows(IllegalArgumentException.class, () -> transactionService.withdraw("test@example.com", 1L, BigDecimal.valueOf(100)));
+        assertThrows(InsufficientBalanceException.class, () -> transactionService.withdraw("test@example.com", 1L, BigDecimal.valueOf(100)));
     }
 
     @Test
@@ -139,7 +140,7 @@ class TransactionServiceTest {
         when(accountService.getAccountByEmailAndId("test@example.com", 1L)).thenReturn(testAccount);
         when(accountRepository.findByAccountNumber("100000002")).thenReturn(Optional.of(receiverAccount));
 
-        assertThrows(IllegalStateException.class, () -> transactionService.transfer("test@example.com", 1L, transferDto));
+        assertThrows(AccountInactiveException.class, () -> transactionService.transfer("test@example.com", 1L, transferDto));
     }
 
     @Test
@@ -150,7 +151,7 @@ class TransactionServiceTest {
         when(accountService.getAccountByEmailAndId("test@example.com", 1L)).thenReturn(testAccount);
         when(accountRepository.findByAccountNumber("100000002")).thenReturn(Optional.of(receiverAccount));
 
-        assertThrows(IllegalArgumentException.class, () -> transactionService.transfer("test@example.com", 1L, transferDto));
+        assertThrows(InsufficientBalanceException.class, () -> transactionService.transfer("test@example.com", 1L, transferDto));
     }
 
     @Test
@@ -162,6 +163,6 @@ class TransactionServiceTest {
         when(accountService.getAccountByEmailAndId("test@example.com", 1L)).thenReturn(testAccount);
         when(accountRepository.findByAccountNumber("100000002")).thenReturn(Optional.of(receiverAccount));
 
-        assertThrows(IllegalArgumentException.class, () -> transactionService.transfer("test@example.com", 1L, transferDto));
+        assertThrows(TransferLimitExceededException.class, () -> transactionService.transfer("test@example.com", 1L, transferDto));
     }
 }
