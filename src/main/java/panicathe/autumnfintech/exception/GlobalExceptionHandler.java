@@ -12,11 +12,14 @@ import panicathe.autumnfintech.dto.ApiResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // BusinessException 처리
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<String>> handleBusinessException(BusinessException ex) {
-        return new ResponseEntity<>(new ApiResponse<>(false, ex.getMessage(), ex.getCode()), ex.getStatus());
+        return ResponseEntity.status(ex.getStatus())
+                .body(new ApiResponse<>(false, ex.getMessage(), ex.getCode()));
     }
 
+    // 그 외 Exception 처리
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ApiResponse<String>> handleGenericException(Exception ex) {

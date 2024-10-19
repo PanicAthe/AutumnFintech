@@ -44,7 +44,7 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    public void setActive(boolean b) {
-        this.isActive = b;
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
 }

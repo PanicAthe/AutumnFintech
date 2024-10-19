@@ -1,4 +1,4 @@
-package panicathe.autumnfintech.dto;
+package panicathe.autumnfintech.dto.transaction;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-public class TransferDto {
+public class TranactionDto {
 
     @NotBlank
     private String receiverAccountNumber;

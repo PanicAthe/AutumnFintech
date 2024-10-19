@@ -45,10 +45,10 @@ public class AccountService {
     public void deleteAccount(String email, Long accountId) {
         Account account = getAccountByEmailAndId(email, accountId);
         if (!account.isActive()) {
-            throw new AccountInactiveException();  // AccountInactiveException 사용
+            throw new AccountInactiveException();
         }
         if (account.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-            throw new InsufficientBalanceException();  // InsufficientBalanceException 사용
+            throw new InsufficientBalanceException();
         }
         accountRepository.delete(account);
     }
@@ -58,7 +58,7 @@ public class AccountService {
     public void setTransferLimit(String email, Long accountId, BigDecimal newLimit) {
         Account account = getAccountByEmailAndId(email, accountId);
         account.setTransferLimit(newLimit);
-        // save 호출 불필요
+        accountRepository.save(account);  // 변경된 한도를 저장
     }
 
     // 4. 본인의 계좌 상세 정보를 ID로 조회

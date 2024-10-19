@@ -28,7 +28,6 @@ public class AdminService {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(AccountNotFoundException::new);
         account.setActive(isActive);  // 계좌 활성화/비활성화 상태 변경
-        accountRepository.save(account);
     }
 
     // 특정 계좌 송금 한도 설정
@@ -37,6 +36,5 @@ public class AdminService {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(AccountNotFoundException::new);
         account.setTransferLimit(newLimit);  // 계좌 송금 한도 설정
-        accountRepository.save(account);
     }
 }

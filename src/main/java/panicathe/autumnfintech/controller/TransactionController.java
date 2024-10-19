@@ -7,13 +7,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import panicathe.autumnfintech.dto.ApiResponse;
-import panicathe.autumnfintech.dto.TransferDto;
+import panicathe.autumnfintech.dto.*;
+import panicathe.autumnfintech.dto.transaction.TranactionDto;
+import panicathe.autumnfintech.dto.transaction.TransactionAmountRequest;
 import panicathe.autumnfintech.dto.transaction.TransactionDetailDto;
 import panicathe.autumnfintech.dto.transaction.TransactionListDto;
 import panicathe.autumnfintech.service.TransactionService;
 
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/transactions")
@@ -27,8 +27,8 @@ public class TransactionController {
     @PostMapping("/{accountId}/deposit")
     public ResponseEntity<ApiResponse<String>> deposit(@AuthenticationPrincipal String email,
                                                        @PathVariable Long accountId,
-                                                       @RequestParam BigDecimal amount) {
-        transactionService.deposit(email, accountId, amount);
+                                                       @RequestBody TransactionAmountRequest amountRequest) {
+        transactionService.deposit(email, accountId, amountRequest.getAmount());
         return ResponseEntity.ok(new ApiResponse<>(true, "Amount deposited successfully", null));
     }
 
@@ -37,8 +37,8 @@ public class TransactionController {
     @PostMapping("/{accountId}/withdraw")
     public ResponseEntity<ApiResponse<String>> withdraw(@AuthenticationPrincipal String email,
                                                         @PathVariable Long accountId,
-                                                        @RequestParam BigDecimal amount) {
-        transactionService.withdraw(email, accountId, amount);
+                                                        @RequestBody TransactionAmountRequest amountRequest) {
+        transactionService.withdraw(email, accountId, amountRequest.getAmount());
         return ResponseEntity.ok(new ApiResponse<>(true, "Amount withdrawn successfully", null));
     }
 
@@ -47,8 +47,8 @@ public class TransactionController {
     @PostMapping("/{accountId}/transfer")
     public ResponseEntity<ApiResponse<String>> transfer(@AuthenticationPrincipal String email,
                                                         @PathVariable Long accountId,
-                                                        @Valid @RequestBody TransferDto transferDto) {
-        transactionService.transfer(email, accountId, transferDto);
+                                                        @Valid @RequestBody TranactionDto tranactionDto) {
+        transactionService.transfer(email, accountId, tranactionDto);
         return ResponseEntity.ok(new ApiResponse<>(true, "Amount transferred successfully", null));
     }
 
