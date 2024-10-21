@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import panicathe.autumnfintech.dto.TransferDto;
+import panicathe.autumnfintech.dto.transaction.TranactionDto;
 import panicathe.autumnfintech.dto.transaction.TransactionDetailDto;
 import panicathe.autumnfintech.dto.transaction.TransactionListDto;
 import panicathe.autumnfintech.entity.Account;
@@ -58,15 +58,15 @@ public class TransactionService {
 
     // 3. 송금 처리
     @Transactional
-    public void transfer(String email, Long senderAccountId, TransferDto transferDto) {
+    public void transfer(String email, Long senderAccountId, TranactionDto tranactionDto) {
         Account senderAccount = accountService.getAccountByEmailAndId(email, senderAccountId);
         validateAccountIsActive(senderAccount);
 
-        Account receiverAccount = accountRepository.findByAccountNumber(transferDto.getReceiverAccountNumber())
+        Account receiverAccount = accountRepository.findByAccountNumber(tranactionDto.getReceiverAccountNumber())
                 .orElseThrow(ReceiverAccountNotFoundException::new);
         validateAccountIsActive(receiverAccount);
 
-        BigDecimal amount = transferDto.getAmount();
+        BigDecimal amount = tranactionDto.getAmount();
         BigDecimal totalAmount = amount.add(FEE);
         validateSufficientBalance(senderAccount, totalAmount);
         validateTransferLimit(senderAccount, totalAmount);

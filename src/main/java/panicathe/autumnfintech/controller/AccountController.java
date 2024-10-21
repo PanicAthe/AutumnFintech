@@ -2,18 +2,17 @@ package panicathe.autumnfintech.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import panicathe.autumnfintech.dto.*;
 import panicathe.autumnfintech.dto.account.AccountDto;
-import panicathe.autumnfintech.dto.ApiResponse;
+import panicathe.autumnfintech.dto.account.AccountLimitRequest;
 import panicathe.autumnfintech.dto.account.CreateAccountDto;
 import panicathe.autumnfintech.dto.account.UserAccountInfoDto;
 import panicathe.autumnfintech.service.AccountService;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -71,9 +70,10 @@ public class AccountController {
     @PutMapping("/{accountId}/limit")
     public ResponseEntity<ApiResponse<String>> setTransferLimit(@AuthenticationPrincipal String email,
                                                                 @PathVariable Long accountId,
-                                                                @RequestParam @NotNull BigDecimal newLimit) {
-        accountService.setTransferLimit(email, accountId, newLimit);
+                                                                @RequestBody AccountLimitRequest limitRequest) {
+        accountService.setTransferLimit(email, accountId, limitRequest.getNewLimit());
         return ResponseEntity.ok(new ApiResponse<>(true, "Transfer limit updated successfully", null));
     }
 }
+
 

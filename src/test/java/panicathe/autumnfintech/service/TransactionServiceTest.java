@@ -9,7 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import panicathe.autumnfintech.dto.TransferDto;
+import panicathe.autumnfintech.dto.transaction.TranactionDto;
 import panicathe.autumnfintech.entity.Account;
 import panicathe.autumnfintech.entity.Transaction;
 import panicathe.autumnfintech.entity.enums.TransactionType;
@@ -57,6 +57,7 @@ class TransactionServiceTest {
                 .build();
     }
 
+    // 1. 입금 테스트
     @Test
     void deposit_success() {
         when(accountService.getAccountByEmailAndId("test@example.com", 1L)).thenReturn(testAccount);
@@ -80,6 +81,7 @@ class TransactionServiceTest {
         assertThrows(AccountInactiveException.class, () -> transactionService.deposit("test@example.com", 1L, BigDecimal.valueOf(100)));
     }
 
+    // 2. 출금 테스트
     @Test
     void withdraw_success() {
         testAccount.setBalance(BigDecimal.valueOf(200));
@@ -111,17 +113,18 @@ class TransactionServiceTest {
         assertThrows(InsufficientBalanceException.class, () -> transactionService.withdraw("test@example.com", 1L, BigDecimal.valueOf(100)));
     }
 
+    // 3. 송금 테스트
     @Test
     void transfer_success() {
         testAccount.setBalance(BigDecimal.valueOf(500));
-        TransferDto transferDto = new TransferDto("100000002", BigDecimal.valueOf(200));
+        TranactionDto tranactionDto = new TranactionDto("100000002", BigDecimal.valueOf(200));
 
         when(accountService.getAccountByEmailAndId("test@example.com", 1L)).thenReturn(testAccount);
         when(accountRepository.findByAccountNumber("100000002")).thenReturn(Optional.of(receiverAccount));
 
         ArgumentCaptor<Transaction> transactionCaptor = ArgumentCaptor.forClass(Transaction.class);
 
-        transactionService.transfer("test@example.com", 1L, transferDto);
+        transactionService.transfer("test@example.com", 1L, tranactionDto);
 
         assertEquals(BigDecimal.valueOf(200), testAccount.getBalance());
         assertEquals(BigDecimal.valueOf(200), receiverAccount.getBalance());
@@ -135,34 +138,34 @@ class TransactionServiceTest {
     @Test
     void transfer_inactiveReceiverAccount_throwsException() {
         receiverAccount.setActive(false);
-        TransferDto transferDto = new TransferDto("100000002", BigDecimal.valueOf(200));
+        TranactionDto tranactionDto = new TranactionDto("100000002", BigDecimal.valueOf(200));
 
         when(accountService.getAccountByEmailAndId("test@example.com", 1L)).thenReturn(testAccount);
         when(accountRepository.findByAccountNumber("100000002")).thenReturn(Optional.of(receiverAccount));
 
-        assertThrows(AccountInactiveException.class, () -> transactionService.transfer("test@example.com", 1L, transferDto));
+        assertThrows(AccountInactiveException.class, () -> transactionService.transfer("test@example.com", 1L, tranactionDto));
     }
 
     @Test
     void transfer_insufficientBalance_throwsException() {
         testAccount.setBalance(BigDecimal.valueOf(100));
-        TransferDto transferDto = new TransferDto("100000002", BigDecimal.valueOf(200));
+        TranactionDto tranactionDto = new TranactionDto("100000002", BigDecimal.valueOf(200));
 
         when(accountService.getAccountByEmailAndId("test@example.com", 1L)).thenReturn(testAccount);
         when(accountRepository.findByAccountNumber("100000002")).thenReturn(Optional.of(receiverAccount));
 
-        assertThrows(InsufficientBalanceException.class, () -> transactionService.transfer("test@example.com", 1L, transferDto));
+        assertThrows(InsufficientBalanceException.class, () -> transactionService.transfer("test@example.com", 1L, tranactionDto));
     }
 
     @Test
     void transfer_amountExceedsTransferLimit_throwsException() {
         testAccount.setBalance(BigDecimal.valueOf(1000));
         testAccount.setTransferLimit(BigDecimal.valueOf(300));
-        TransferDto transferDto = new TransferDto("100000002", BigDecimal.valueOf(400));
+        TranactionDto tranactionDto = new TranactionDto("100000002", BigDecimal.valueOf(400));
 
         when(accountService.getAccountByEmailAndId("test@example.com", 1L)).thenReturn(testAccount);
         when(accountRepository.findByAccountNumber("100000002")).thenReturn(Optional.of(receiverAccount));
 
-        assertThrows(TransferLimitExceededException.class, () -> transactionService.transfer("test@example.com", 1L, transferDto));
+        assertThrows(TransferLimitExceededException.class, () -> transactionService.transfer("test@example.com", 1L, tranactionDto));
     }
 }

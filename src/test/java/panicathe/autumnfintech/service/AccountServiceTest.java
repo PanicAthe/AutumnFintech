@@ -50,14 +50,18 @@ class AccountServiceTest {
                 .balance(BigDecimal.ZERO)
                 .transferLimit(BigDecimal.valueOf(1000))
                 .user(testUser)
-                .isActive(true)  // 기본 활성 상태로 설정
+                .isActive(true)
                 .build();
+
+        // Mock common repository behavior
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
+        when(accountRepository.findByIdAndUser(1L, testUser)).thenReturn(Optional.of(testAccount));
     }
 
+    // 1. 계좌 생성 테스트
     @Test
     void createAccount_success() {
         // Given
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
         when(accountRepository.findByAccountNumber(anyString())).thenReturn(Optional.empty());
 
         // When
@@ -78,12 +82,9 @@ class AccountServiceTest {
                 .transferLimit(BigDecimal.valueOf(500)).build()));
     }
 
+    // 2. 계좌 상세 조회 테스트
     @Test
     void getOwnAccountDetails_success() {
-        // Given
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
-        when(accountRepository.findByIdAndUser(1L, testUser)).thenReturn(Optional.of(testAccount));
-
         // When
         AccountDto accountDto = accountService.getOwnAccountDetails("test@example.com", 1L);
 
@@ -96,19 +97,15 @@ class AccountServiceTest {
     @Test
     void getOwnAccountDetails_accountNotFound_throwsException() {
         // Given
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
         when(accountRepository.findByIdAndUser(1L, testUser)).thenReturn(Optional.empty());
 
         // Then
         assertThrows(AccountNotFoundException.class, () -> accountService.getOwnAccountDetails("test@example.com", 1L));
     }
 
+    // 3. 계좌 삭제 테스트
     @Test
     void deleteAccount_success() {
-        // Given
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
-        when(accountRepository.findByIdAndUser(1L, testUser)).thenReturn(Optional.of(testAccount));
-
         // When
         accountService.deleteAccount("test@example.com", 1L);
 
@@ -120,10 +117,38 @@ class AccountServiceTest {
     void deleteAccount_withBalance_throwsException() {
         // Given
         testAccount.setBalance(BigDecimal.valueOf(100));
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
-        when(accountRepository.findByIdAndUser(1L, testUser)).thenReturn(Optional.of(testAccount));
 
         // Then
         assertThrows(InsufficientBalanceException.class, () -> accountService.deleteAccount("test@example.com", 1L));
     }
+
+    @Test
+    void deleteAccount_inactiveAccount_throwsException() {
+        // Given
+        testAccount.setActive(false);
+
+        // Then
+        assertThrows(AccountInactiveException.class, () -> accountService.deleteAccount("test@example.com", 1L));
+    }
+
+    // 4. 송금 한도 설정 테스트
+    @Test
+    void setTransferLimit_success() {
+        // When
+        accountService.setTransferLimit("test@example.com", 1L, BigDecimal.valueOf(2000));
+
+        // Then
+        verify(accountRepository, times(1)).save(testAccount);
+        assertEquals(BigDecimal.valueOf(2000), testAccount.getTransferLimit());
+    }
+
+    @Test
+    void setTransferLimit_accountNotFound_throwsException() {
+        // Given
+        when(accountRepository.findByIdAndUser(1L, testUser)).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(AccountNotFoundException.class, () -> accountService.setTransferLimit("test@example.com", 1L, BigDecimal.valueOf(2000)));
+    }
+
 }
